@@ -1,0 +1,90 @@
+from django.db import models
+from tenant_users.tenants.models import UserProfile
+from tenant.models import SchoolType, SchoolLevel
+
+
+class OrganizationProfileManager(models.Manager):
+    def create_organization_profile(self, organization, school_name, street_address,
+                                    postal_code, state, city, country, street_address_extra=None, billing_same_as_address=False,
+                                    billing_street_address=None, billing_street_address_extra=None,
+                                    billing_postal_code=None, billing_state=None, billing_city=None,
+                                    billing_country=None, phone_number=None, telephone_number=None,
+                                    website=None, contact_person_name=None, contact_person_email=None,
+                                    contact_person_phone=None, school_type=None, school_level=None,
+                                    enrollment_capacity=1):
+        organization_profile = self.model(
+            organization=organization,
+            school_name=school_name,
+            street_address=street_address,
+            street_address_extra=street_address_extra,
+            postal_code=postal_code,
+            state=state,
+            city=city,
+            country=country,
+            billing_same_as_address=billing_same_as_address,
+            billing_street_address=billing_street_address,
+            billing_street_address_extra=billing_street_address_extra,
+            billing_postal_code=billing_postal_code,
+            billing_state=billing_state,
+            billing_city=billing_city,
+            billing_country=billing_country,
+            phone_number=phone_number,
+            telephone_number=telephone_number,
+            website=website,
+            contact_person_name=contact_person_name,
+            contact_person_email=contact_person_email,
+            contact_person_phone=contact_person_phone,
+            school_type=school_type,
+            school_level=school_level,
+            enrollment_capacity=enrollment_capacity
+        )
+        organization_profile.save()
+        return organization_profile
+
+
+class OrganizationUser(UserProfile):
+    is_main = models.BooleanField(default=False)
+
+
+class OrganizationProfile(models.Model):
+    organization = models.ForeignKey(OrganizationUser, on_delete=models.PROTECT)
+
+    # Additional fields for school organization
+    school_name = models.CharField(max_length=255)
+
+    # Address
+    street_address = models.CharField(max_length=255)
+    street_address_extra = models.CharField(max_length=255, blank=True, null=True)
+    postal_code = models.CharField(max_length=255)
+    state = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    country = models.CharField(max_length=255)
+
+    # Billing Address
+    billing_street_address = models.CharField(max_length=255, blank=True, null=True)
+    billing_street_address_extra = models.CharField(max_length=255, blank=True, null=True)
+    billing_postal_code = models.CharField(max_length=255, blank=True, null=True)
+    billing_state = models.CharField(max_length=255, blank=True, null=True)
+    billing_city = models.CharField(max_length=255, blank=True, null=True)
+    billing_country = models.CharField(max_length=255, blank=True, null=True)
+
+    # Flags for checking billing address
+    billing_same_as_address = models.BooleanField(default=False)
+
+    # Additional Information
+    phone_number = models.CharField(max_length=20)
+    telephone_number = models.CharField(max_length=20, blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
+
+    # Contact Person fields
+    contact_person_name = models.CharField(max_length=255)
+    contact_person_email = models.EmailField()
+    contact_person_phone = models.CharField(max_length=20)
+
+    # Extra Info
+    school_type = models.ForeignKey(SchoolType, on_delete=models.PROTECT)
+    school_level = models.ForeignKey(SchoolLevel, on_delete=models.PROTECT)
+    enrollment_capacity = models.PositiveIntegerField(default=1)
+    # ... add more fields as needed
+
+    objects = OrganizationProfileManager()
