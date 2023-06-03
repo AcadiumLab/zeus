@@ -1,3 +1,4 @@
-from .lookups import *
-from .user_model import OrganizationUser, OrganizationProfile
 from .client_model import Domain, Client
+from .lookups import *
+from .signals import *
+from .user_model import OrganizationUser, OrganizationProfile

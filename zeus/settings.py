@@ -32,18 +32,21 @@ else:
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY',  cast=str)
+SECRET_KEY = config('SECRET_KEY', cast=str)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
-PUBLIC_TENANT_DOMAIN_NAME = config('PUBLIC_TENANT_DOMAIN_NAME',  cast=str)
-
+PUBLIC_TENANT_DOMAIN_NAME = config('PUBLIC_TENANT_DOMAIN_NAME', cast=str)
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ]
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    )
+}
+# https://django-oauth-toolkit.readthedocs.io/en/latest/rest-framework/getting_started.html
+OAUTH2_PROVIDER = {
+    # this is the list of available scopes
+    'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
 }
 
 # Tenants application definition
@@ -61,6 +64,7 @@ SHARED_APPS = (
     # everything below here is optional
     'django.contrib.contenttypes',
     'django.contrib.auth',
+    'django.contrib.staticfiles',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
@@ -68,8 +72,8 @@ SHARED_APPS = (
 
     # Rest framework
     'rest_framework',
-    'django.contrib.staticfiles',
     'drf_yasg',
+    'oauth2_provider',
 )
 
 TENANT_APPS = (
@@ -177,7 +181,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -187,3 +190,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config.get('SMTP_HOST', cast=str)
+EMAIL_PORT = config.get('SMTP_PORT', cast=int)  # Replace with the appropriate SMTP port
+EMAIL_USE_TLS = True  # Use TLS encryption for secure communication
+EMAIL_HOST_USER = config.get('SMTP_USERNAME', cast=str)  # SMTP username or email
+EMAIL_HOST_PASSWORD = config.get('SMTP_PASSWORD', cast=str)  # SMTP password
+DEFAULT_FROM_EMAIL = config.get('DEFAULT_FROM_EMAIL', cast=str)  # Default "from" email address
+
+ACTIVATION_LINK_URL = config.get('ACTIVATION_LINK_URL', cast=str)

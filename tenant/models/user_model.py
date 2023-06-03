@@ -1,8 +1,10 @@
+from django.conf import settings
 from django.db import models, connection
+from django.utils.translation import gettext_lazy as _
 from django_tenants.utils import get_public_schema_name
 from tenant_users.tenants.models import UserProfile, SchemaError
+
 from tenant.models import SchoolType, SchoolLevel
-from django.utils.translation import gettext_lazy as _
 
 
 class OrganizationProfileManager(models.Manager):
@@ -56,7 +58,7 @@ class OrganizationUser(UserProfile):
 
 
 class OrganizationProfile(models.Model):
-    organization = models.OneToOneField(OrganizationUser, on_delete=models.PROTECT)
+    organization = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
 
     # Additional fields for school organization
     school_name = models.CharField(max_length=255)
