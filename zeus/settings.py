@@ -41,13 +41,23 @@ PUBLIC_TENANT_DOMAIN_NAME = config('PUBLIC_TENANT_DOMAIN_NAME', cast=str)
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
     )
 }
 # https://django-oauth-toolkit.readthedocs.io/en/latest/rest-framework/getting_started.html
 OAUTH2_PROVIDER = {
     # this is the list of available scopes
-    'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
+    'SCOPES': {
+        'read': 'Read scope',
+        'write': 'Write scope',
+        'groups': 'Access to your groups',
+    }
 }
+
+CLIENT_ID = config('CLIENT_ID', cast=str)
+CLIENT_SECRET = config('CLIENT_SECRET', cast=str)
 
 # Tenants application definition
 SHARED_APPS = (
@@ -97,6 +107,10 @@ AUTHENTICATION_BACKENDS = (
     'tenant_users.permissions.backend.UserBackend',
 )
 
+SWAGGER_SETTINGS = {
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'utils.schema.ReadWriteAutoSchema',
+}
+
 TENANT_USERS_DOMAIN = 'test.com'
 
 MIDDLEWARE = [
@@ -131,7 +145,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'zeus.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

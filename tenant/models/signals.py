@@ -12,6 +12,7 @@ def create_verification_code(sender, instance, created, **kwargs):
     if created:
         # Perform actions when a new User is created
         # For example, create a user profile
+
         token = default_token_generator.make_token(instance)
 
         activation_link = f'{settings.ACTIVATION_LINK_URL}?user_id={instance.id}&confirmation_token={token}'
