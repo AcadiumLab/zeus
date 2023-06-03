@@ -1,11 +1,19 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from tenant.serializers.client_serializer import ClientSerializer
 from tenant.models import OrganizationProfile, OrganizationUser
 
 
 class OrganizationUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    is_main = serializers.BooleanField(read_only=True)
+    is_active = serializers.BooleanField(read_only=True)
+    is_verified = serializers.BooleanField(read_only=True)
+    last_login = serializers.DateTimeField(read_only=True)
+    tenants = serializers.ManyRelatedField(read_only=True, child_relation=ClientSerializer(),
+                                           source='user_set',
+                                           )
 
     class Meta:
         model = OrganizationUser
@@ -13,7 +21,8 @@ class OrganizationUserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = OrganizationUser.objects.create_user(
-            **validated_data
+            **validated_data,
+            is_main=True
         )
 
         return user

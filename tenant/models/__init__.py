@@ -1,3 +1,3 @@
 from .lookups import *
-from .user import OrganizationUser, OrganizationProfile
-from .client import Domain, Client
+from .user_model import OrganizationUser, OrganizationProfile
+from .client_model import Domain, Client

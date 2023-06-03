@@ -1,17 +1,26 @@
-from django.db import models
-from tenant_users.tenants.models import UserProfile
+from django.db import models, connection
+from django_tenants.utils import get_public_schema_name
+from tenant_users.tenants.models import UserProfile, SchemaError
 from tenant.models import SchoolType, SchoolLevel
+from django.utils.translation import gettext_lazy as _
 
 
 class OrganizationProfileManager(models.Manager):
     def create_organization_profile(self, organization, school_name, street_address,
-                                    postal_code, state, city, country, street_address_extra=None, billing_same_as_address=False,
+                                    postal_code, state, city, country, street_address_extra=None,
+                                    billing_same_as_address=False,
                                     billing_street_address=None, billing_street_address_extra=None,
                                     billing_postal_code=None, billing_state=None, billing_city=None,
                                     billing_country=None, phone_number=None, telephone_number=None,
                                     website=None, contact_person_name=None, contact_person_email=None,
                                     contact_person_phone=None, school_type=None, school_level=None,
                                     enrollment_capacity=1):
+
+        if connection.schema_name != get_public_schema_name():
+            raise SchemaError(
+                'Schema must be public for UserProfileManager user creation',
+            )
+
         organization_profile = self.model(
             organization=organization,
             school_name=school_name,
@@ -43,11 +52,11 @@ class OrganizationProfileManager(models.Manager):
 
 
 class OrganizationUser(UserProfile):
-    is_main = models.BooleanField(default=False)
+    is_main = models.BooleanField(_('User main account'), default=False)
 
 
 class OrganizationProfile(models.Model):
-    organization = models.ForeignKey(OrganizationUser, on_delete=models.PROTECT)
+    organization = models.OneToOneField(OrganizationUser, on_delete=models.PROTECT)
 
     # Additional fields for school organization
     school_name = models.CharField(max_length=255)

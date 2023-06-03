@@ -36,6 +36,16 @@ SECRET_KEY = config('SECRET_KEY',  cast=str)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
+PUBLIC_TENANT_DOMAIN_NAME = config('PUBLIC_TENANT_DOMAIN_NAME',  cast=str)
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
+
 # Tenants application definition
 SHARED_APPS = (
     # Django tenants app
@@ -58,6 +68,8 @@ SHARED_APPS = (
 
     # Rest framework
     'rest_framework',
+    'django.contrib.staticfiles',
+    'drf_yasg',
 )
 
 TENANT_APPS = (
@@ -99,7 +111,9 @@ ROOT_URLCONF = 'zeus.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'tenant' / 'templates'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
