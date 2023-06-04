@@ -3,7 +3,7 @@ from rest_framework.exceptions import ValidationError
 from tenant_users.tenants.models import ExistsError
 from tenant_users.tenants.tasks import provision_tenant
 
-from tenant.models import Client
+from tenant.models import Client, OrganizationUser
 
 
 class ClientCreateSerializer(serializers.ModelSerializer):
@@ -41,3 +41,17 @@ class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         exclude = ()
+
+
+class ClientUserSerializer(serializers.ModelSerializer):
+    tenant = serializers.PrimaryKeyRelatedField(queryset=Client.objects.all(), write_only=True)
+
+    class Meta:
+        model = OrganizationUser
+        exclude = ('password', 'tenants',)
+        extra_kwargs = {
+            'is_main': {'read_only': True},
+            'is_verified': {'read_only': True},
+            'is_active': {'read_only': True},
+            'last_login': {'read_only': True},
+        }

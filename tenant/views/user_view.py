@@ -29,7 +29,7 @@ class CreateOrganizationUserProfile(generics.UpdateAPIView):
         queryset = self.filter_queryset(self.get_queryset())
 
         filter_kwargs = {'organization': self.request.user}
-        print(filter_kwargs)
+
         obj = get_object_or_404(queryset, **filter_kwargs)
 
         # May raise a permission denied
@@ -72,7 +72,7 @@ class RetrieveOrganizationProfile(generics.RetrieveAPIView):
         queryset = self.filter_queryset(self.get_queryset())
 
         filter_kwargs = {'organization': self.request.user}
-        print(filter_kwargs)
+
         obj = get_object_or_404(queryset, **filter_kwargs)
 
         # May raise a permission denied

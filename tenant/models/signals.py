@@ -9,7 +9,7 @@ from utils.email import send_email
 
 @receiver(post_save, sender=OrganizationUser)
 def create_verification_code(sender, instance, created, **kwargs):
-    if created:
+    if created and instance.is_main:
         # Perform actions when a new User is created
         # For example, create a user profile
         OrganizationProfile.objects.create(

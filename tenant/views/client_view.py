@@ -3,7 +3,7 @@ from rest_framework import generics
 from rest_framework.throttling import UserRateThrottle
 
 from tenant.models import Client
-from tenant.serializers.client_serializer import ClientCreateSerializer, ClientSerializer
+from tenant.serializers.client_serializer import ClientCreateSerializer, ClientSerializer, ClientUserSerializer
 from utils import permissions
 
 
@@ -45,3 +45,9 @@ class ListOrganizationDatabaseView(generics.ListAPIView):
             # Ensure queryset is re-evaluated on each request.
             queryset = queryset.all()
         return queryset
+
+
+class CreateClientUser(generics.CreateAPIView):
+    serializer_class = ClientUserSerializer
+    # TODO ADD PERMISSION THAT CAN CHANGE TENANT
+    permission_classes = (permissions.IsAuthenticated, permissions.IsVerified, permissions.IsMainUser,)
