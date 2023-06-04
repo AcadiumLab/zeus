@@ -111,7 +111,7 @@ SWAGGER_SETTINGS = {
     'DEFAULT_AUTO_SCHEMA_CLASS': 'utils.schema.ReadWriteAutoSchema',
 }
 
-TENANT_USERS_DOMAIN = 'test.com'
+TENANT_USERS_DOMAIN = config('TENANT_USERS_DOMAIN', cast=str)
 
 MIDDLEWARE = [
     'django_tenants.middleware.main.TenantMainMiddleware',

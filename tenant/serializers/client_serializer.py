@@ -6,7 +6,7 @@ from tenant_users.tenants.tasks import provision_tenant
 from tenant.models import Client
 
 
-class ClientSerializer(serializers.ModelSerializer):
+class ClientCreateSerializer(serializers.ModelSerializer):
     detail = serializers.CharField(read_only=True)
     success = serializers.BooleanField(read_only=True)
 
@@ -35,3 +35,9 @@ class ClientSerializer(serializers.ModelSerializer):
             'detail': 'Creating database for %s, this process may take time please wait.' % validated_data['name'],
             'success': True
         }
+
+
+class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        exclude = ()
