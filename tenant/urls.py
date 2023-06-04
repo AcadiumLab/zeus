@@ -4,10 +4,11 @@ from .views import CreateOrganizationUser, CreateOrganizationUserProfile, Retrie
     RetrieveOrganizationProfile
 from .views.activation_view import UserActivationView
 from .views.authentication_view import OrganizationAuthenticationView
+from .views.client_view import CreateOrganizationDatabaseView
 
 app_name = 'tenant'
 urlpatterns = [
-    path('organization-users/create/', CreateOrganizationUser.as_view(), name='organization-user-create'),
+    path('organization-user/create/', CreateOrganizationUser.as_view(), name='organization-user-create'),
     path('organization-profile/update/', CreateOrganizationUserProfile.as_view(), name='organization-profile-create'),
     path('organization-activate/', UserActivationView.as_view(), name='organization-user-activation'),
 
@@ -15,4 +16,6 @@ urlpatterns = [
     path('organization-profile/', RetrieveOrganizationProfile.as_view(), name='retrieve-profile'),
 
     path('login/', OrganizationAuthenticationView.as_view(), name='organization-login'),
+
+    path('organization-db/create', CreateOrganizationDatabaseView.as_view(), name='organization-db-create'),
 ]

@@ -9,3 +9,13 @@ class IsVerified(BasePermission):
 
     def has_permission(self, request, view):
         return bool(request.user and request.user.is_verified)
+
+
+class IsMainUser(BasePermission):
+    """
+    Allows access only to main users.
+    """
+    message = 'You do not have permission to do this action'
+
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_main)
