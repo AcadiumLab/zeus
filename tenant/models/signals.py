@@ -3,7 +3,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from tenant.models.user_model import OrganizationUser
+from tenant.models.user_model import OrganizationUser, OrganizationProfile
 from utils.email import send_email
 
 
@@ -12,6 +12,9 @@ def create_verification_code(sender, instance, created, **kwargs):
     if created:
         # Perform actions when a new User is created
         # For example, create a user profile
+        OrganizationProfile.objects.create(
+            organization=instance
+        )
 
         token = default_token_generator.make_token(instance)
 

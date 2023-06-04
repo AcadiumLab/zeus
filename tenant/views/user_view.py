@@ -9,7 +9,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
-from tenant.models import OrganizationUser
+from tenant.models import OrganizationUser, OrganizationProfile
 from tenant.serializers import OrganizationUserSerializer, OrganizationProfileSerializer, \
     AuthenticateOrganizationSerializer
 from utils import permissions
@@ -21,10 +21,30 @@ class CreateOrganizationUser(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
 
 
-class CreateOrganizationUserProfile(generics.CreateAPIView):
+class CreateOrganizationUserProfile(generics.UpdateAPIView):
     serializer_class = OrganizationProfileSerializer
     permission_classes = (permissions.IsAuthenticated, permissions.IsVerified)
     throttle_classes = [UserRateThrottle]
+    queryset = OrganizationProfile.objects.all()
+
+    def get_object(self):
+        """
+        Returns the object the view is displaying.
+
+        You may want to override this if you need to provide non-standard
+        queryset lookups.  Eg if objects are referenced using multiple
+        keyword arguments in the url conf.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+
+        filter_kwargs = {'organization': self.request.user}
+        print(filter_kwargs)
+        obj = get_object_or_404(queryset, **filter_kwargs)
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, obj)
+
+        return obj
 
 
 class UserActivationView(generics.RetrieveAPIView):
@@ -51,7 +71,7 @@ class UserActivationView(generics.RetrieveAPIView):
                                     'signing in.'}
                             , status=status.HTTP_400_BAD_REQUEST)
 
-        if not user.is_active and not user.is_verified:
+        if not user.is_active or not user.is_verified:
             user.is_active = True
             user.is_verified = True
             user.save()

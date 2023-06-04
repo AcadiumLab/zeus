@@ -61,15 +61,15 @@ class OrganizationProfile(models.Model):
     organization = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
 
     # Additional fields for school organization
-    school_name = models.CharField(max_length=255)
+    school_name = models.CharField(max_length=255, null=True)
 
     # Address
-    street_address = models.CharField(max_length=255)
+    street_address = models.CharField(max_length=255, null=True)
     street_address_extra = models.CharField(max_length=255, blank=True, null=True)
-    postal_code = models.CharField(max_length=255)
-    state = models.CharField(max_length=255)
-    city = models.CharField(max_length=255)
-    country = models.CharField(max_length=255)
+    postal_code = models.CharField(max_length=255, null=True)
+    state = models.CharField(max_length=255, null=True)
+    city = models.CharField(max_length=255, null=True)
+    country = models.CharField(max_length=255, null=True)
 
     # Billing Address
     billing_street_address = models.CharField(max_length=255, blank=True, null=True)
@@ -83,18 +83,18 @@ class OrganizationProfile(models.Model):
     billing_same_as_address = models.BooleanField(default=False)
 
     # Additional Information
-    phone_number = models.CharField(max_length=20)
+    phone_number = models.CharField(max_length=20, null=True)
     telephone_number = models.CharField(max_length=20, blank=True, null=True)
     website = models.URLField(blank=True, null=True)
 
     # Contact Person fields
-    contact_person_name = models.CharField(max_length=255)
-    contact_person_email = models.EmailField()
-    contact_person_phone = models.CharField(max_length=20)
+    contact_person_name = models.CharField(max_length=255, null=True)
+    contact_person_email = models.EmailField(null=True)
+    contact_person_phone = models.CharField(max_length=20, null=True)
 
     # Extra Info
-    school_type = models.ForeignKey(SchoolType, on_delete=models.PROTECT)
-    school_level = models.ForeignKey(SchoolLevel, on_delete=models.PROTECT)
+    school_type = models.ForeignKey(SchoolType, on_delete=models.PROTECT, null=True)
+    school_level = models.ForeignKey(SchoolLevel, on_delete=models.PROTECT, null=True)
     enrollment_capacity = models.PositiveIntegerField(default=1)
     # ... add more fields as needed
 

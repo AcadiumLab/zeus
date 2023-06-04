@@ -44,11 +44,18 @@ class OrganizationProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrganizationProfile
         exclude = ()
-
-    def create(self, validated_data):
-        organization = self.context['request'].user
-        profile = OrganizationProfile.objects.create_organization_profile(organization=organization, **validated_data)
-        return profile
+        extra_kwargs = {
+            'school_name': {'required': True},
+            'street_address': {'required': True},
+            'postal_code': {'required': True},
+            'state': {'required': True},
+            'city': {'required': True},
+            'country': {'required': True},
+            'phone_number': {'required': True},
+            'contact_person_name': {'required': True},
+            'contact_person_email': {'required': True},
+            'contact_person_phone': {'required': True},
+        }
 
 
 class AuthenticateOrganizationSerializer(Serializer):
