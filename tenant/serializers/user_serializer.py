@@ -59,8 +59,9 @@ class OrganizationProfileSerializer(serializers.ModelSerializer):
 
 
 class AuthenticateOrganizationSerializer(Serializer):
-    email = serializers.EmailField(write_only=True, read_only=False)
+    username = serializers.EmailField(write_only=True, read_only=False)
     password = serializers.CharField(write_only=True, read_only=False)
+    grant_type = serializers.CharField(write_only=True, read_only=False)
 
     access_token = serializers.CharField(read_only=True)
     token_type = serializers.CharField(read_only=True)

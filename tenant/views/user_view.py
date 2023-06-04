@@ -6,6 +6,7 @@ from drf_yasg.utils import swagger_auto_schema
 from oauth2_provider.views import TokenView
 from rest_framework import generics, status
 from rest_framework.generics import get_object_or_404
+from rest_framework.parsers import FormParser
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
@@ -83,17 +84,20 @@ class UserActivationView(generics.RetrieveAPIView):
 class OrganizationAuthenticationView(generics.CreateAPIView):
     serializer_class = AuthenticateOrganizationSerializer
     permission_classes = (permissions.AllowAny,)
+    parser_classes = (FormParser,)
 
     def create(self, request, *args, **kwargs):
         view = TokenView()
         new_request = HttpRequest()
-        new_request.method = 'POST'
+        new_request.method = request.method
+        new_request.content_type = request.content_type
+        new_request.content_params = request.content_params
+        for key, value in dict(request.POST).items():
+            new_request.POST[key] = request.POST[key]
 
-        new_request.POST['username'] = request.data.get('email', request.data['username'])
-        new_request.POST['password'] = request.data['password']
-        new_request.POST['grant_type'] = 'password'
         new_request.POST['client_id'] = settings.CLIENT_ID
         new_request.POST['client_secret'] = settings.CLIENT_SECRET
+
         response = view.post(new_request)
 
         return response
