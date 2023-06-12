@@ -3,7 +3,8 @@ from rest_framework.exceptions import ValidationError
 from tenant_users.tenants.models import ExistsError
 from tenant_users.tenants.tasks import provision_tenant
 
-from tenant.models import Client, OrganizationUser
+from tenant.models import Client, OrganizationUser, Domain
+from tenant.models.user_model import OrganizationUserProfile
 
 
 class ClientCreateSerializer(serializers.ModelSerializer):
@@ -12,10 +13,12 @@ class ClientCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Client
-        fields = ('name', 'slug', 'detail', 'success',)
+        fields = ('name', 'slug', 'on_trial', 'paid_until', 'detail', 'success',)
         extra_kwargs = {
             'name': {'write_only': True},
-            'slug': {'write_only': True}
+            'slug': {'write_only': True},
+            'paid_until': {'read_only': True},
+            'on_trial': {'read_only': True},
         }
 
     def create(self, validated_data):
@@ -37,6 +40,12 @@ class ClientCreateSerializer(serializers.ModelSerializer):
         }
 
 
+class ClientDomainCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Domain
+        exclude = ()
+
+
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
@@ -55,3 +64,43 @@ class ClientUserSerializer(serializers.ModelSerializer):
             'is_active': {'read_only': True},
             'last_login': {'read_only': True},
         }
+
+
+class ClientUserProfileSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True, allow_blank=False)
+    password = serializers.CharField(write_only=True, required=True, allow_blank=False)
+    is_active = serializers.BooleanField(read_only=True, source='organization.is_active')
+    is_verified = serializers.BooleanField(read_only=True, source='organization.is_verified')
+    is_main = serializers.BooleanField(read_only=True, source='organization.is_main')
+    last_login = serializers.DateTimeField(read_only=True, source='organization.last_login')
+    tenant = serializers.PrimaryKeyRelatedField(write_only=True, queryset=Client.objects.all())
+
+    class Meta:
+        model = OrganizationUserProfile
+        exclude = ('organization',)
+
+    def create(self, validated_data):
+        email = validated_data.pop('email')
+        password = validated_data.pop('password')
+        tenant = validated_data.pop('tenant')
+
+        profile = OrganizationUserProfile()
+        for key, value in validated_data.items():
+            setattr(profile, key, value)
+
+        user = OrganizationUser.objects.create_user(
+            email=email,
+            password=password,
+            is_main=False
+        )
+
+        setattr(profile, 'organization', user)
+
+        profile.save()
+        setattr(profile, 'email', email)
+
+        tenant.add_user(
+            user_obj=user
+        )
+
+        return profile

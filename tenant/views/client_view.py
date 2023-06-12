@@ -2,22 +2,40 @@ from django.db.models import QuerySet
 from rest_framework import generics
 from rest_framework.throttling import UserRateThrottle
 
-from tenant.models import Client
-from tenant.serializers.client_serializer import ClientCreateSerializer, ClientSerializer, ClientUserSerializer
+from tenant.models import Client, OrganizationUser, Domain
+from tenant.serializers.client_serializer import ClientCreateSerializer, ClientSerializer, ClientDomainCreateSerializer, \
+    ClientUserProfileSerializer
 from utils import permissions
 
 
-class CreateOrganizationDatabaseView(generics.CreateAPIView):
-    serializer_class = ClientCreateSerializer
+class OrganizationDatabaseView(generics.ListCreateAPIView):
+    serializer_class = {
+        'get': ClientSerializer,
+        'post': ClientCreateSerializer,
+    }
     # TODO ADD PERMISSION FOR TRIAL AND PAID USERS
-    permission_classes = (permissions.IsAuthenticated, permissions.IsVerified, permissions.IsMainUser,)
+    permission_classes = (permissions.IsAuthenticated, permissions.IsVerified, permissions.IsMainUserOrReadOnly,)
+    queryset = Client.objects.all()
     throttle_classes = [UserRateThrottle]
 
+    def get_serializer_class(self):
+        """
+        Return the class to use for the serializer.
+        Defaults to using `self.serializer_class`.
 
-class ListOrganizationDatabaseView(generics.ListAPIView):
-    serializer_class = ClientSerializer
-    permission_classes = (permissions.IsAuthenticated, permissions.IsVerified,)
-    queryset = Client.objects.all()
+        You may want to override this if you need to provide different
+        serializations depending on the incoming request.
+
+        (Eg. admins get full serialization, others get basic serialization)
+        """
+
+        assert self.serializer_class.get(self.request.method.lower(), None) is not None, (
+                "'%s' should either include a `serializer_class` attribute, "
+                "or override the `get_serializer_class()` method."
+                % self.__class__.__name__
+        )
+
+        return self.serializer_class[self.request.method.lower()]
 
     def get_queryset(self):
         """
@@ -47,7 +65,15 @@ class ListOrganizationDatabaseView(generics.ListAPIView):
         return queryset
 
 
-class CreateClientUser(generics.CreateAPIView):
-    serializer_class = ClientUserSerializer
+class CreateClientUser(generics.ListCreateAPIView):
+    serializer_class = ClientUserProfileSerializer
+    queryset = OrganizationUser.objects.all()
     # TODO ADD PERMISSION THAT CAN CHANGE TENANT
-    permission_classes = (permissions.IsAuthenticated, permissions.IsVerified, permissions.IsMainUser,)
+    permission_classes = (permissions.IsAuthenticated, permissions.IsVerified, permissions.IsMainUserOrReadOnly,)
+
+
+class CreateClientDomain(generics.ListCreateAPIView):
+    serializer_class = ClientDomainCreateSerializer
+    queryset = Domain.objects.all()
+    # TODO ADD PERMISSION THAT CAN CHANGE TENANT
+    permission_classes = (permissions.IsAuthenticated, permissions.IsVerified, permissions.IsMainUserOrReadOnly,)

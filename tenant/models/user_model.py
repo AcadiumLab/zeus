@@ -17,7 +17,6 @@ class OrganizationProfileManager(models.Manager):
                                     website=None, contact_person_name=None, contact_person_email=None,
                                     contact_person_phone=None, school_type=None, school_level=None,
                                     enrollment_capacity=1):
-
         if connection.schema_name != get_public_schema_name():
             raise SchemaError(
                 'Schema must be public for UserProfileManager user creation',
@@ -99,3 +98,10 @@ class OrganizationProfile(models.Model):
     # ... add more fields as needed
 
     objects = OrganizationProfileManager()
+
+
+class OrganizationUserProfile(models.Model):
+    organization = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    first_name = models.CharField(max_length=255, null=True)
+    last_name = models.CharField(max_length=255, null=True)
