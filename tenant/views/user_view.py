@@ -51,7 +51,6 @@ class RetrieveOrganizationView(generics.RetrieveAPIView):
         queryset lookups.  Eg if objects are referenced using multiple
         keyword arguments in the url conf.
         """
-
         return self.request.user
 
 

@@ -5,6 +5,7 @@ from django_tenants.utils import get_public_schema_name
 from tenant_users.tenants.models import UserProfile, SchemaError
 
 from tenant.models import SchoolType, SchoolLevel
+from tenant.models.client_model import Department, Role
 
 
 class OrganizationProfileManager(models.Manager):
@@ -54,6 +55,8 @@ class OrganizationProfileManager(models.Manager):
 
 class OrganizationUser(UserProfile):
     is_main = models.BooleanField(_('User main account'), default=False)
+    departments = models.ManyToManyField(Department, related_name='departments')
+    roles = models.ManyToManyField(Role, related_name='roles')
 
 
 class OrganizationProfile(models.Model):

@@ -3,8 +3,9 @@ from rest_framework import generics
 from rest_framework.throttling import UserRateThrottle
 
 from tenant.models import Client, OrganizationUser, Domain
+from tenant.models.client_model import Department, Role
 from tenant.serializers.client_serializer import ClientCreateSerializer, ClientSerializer, ClientDomainCreateSerializer, \
-    ClientUserProfileSerializer
+    ClientUserProfileSerializer, DepartmentSerializer, RoleSerializer
 from utils import permissions
 
 
@@ -77,3 +78,15 @@ class CreateClientDomain(generics.ListCreateAPIView):
     queryset = Domain.objects.all()
     # TODO ADD PERMISSION THAT CAN CHANGE TENANT
     permission_classes = (permissions.IsAuthenticated, permissions.IsVerified, permissions.IsMainUserOrReadOnly,)
+
+
+class CreateDepartment(generics.ListCreateAPIView):
+    serializer_class = DepartmentSerializer
+    queryset = Department.objects.all()
+    permission_classes = (permissions.IsAuthenticated, permissions.IsVerified,)
+
+
+class CreateRole(generics.ListCreateAPIView):
+    serializer_class = RoleSerializer
+    queryset = Role.objects.all()
+    permission_classes = (permissions.IsAuthenticated, permissions.IsVerified,)

@@ -1,5 +1,6 @@
 from django.urls import path
 
+from tenant.views.client_view import CreateDepartment, CreateRole
 from .views import CreateOrganizationUser, CreateOrganizationUserProfile, RetrieveOrganizationView, \
     RetrieveOrganizationProfile
 from .views.activation_view import UserActivationView
@@ -19,6 +20,8 @@ urlpatterns = [
     path('login/', OrganizationAuthenticationView.as_view(), name='organization-login'),
 
     path('organization/', OrganizationDatabaseView.as_view(), name='org-db'),
+    path('organization/department/', CreateDepartment.as_view(), name='org-department'),
     path('organization/user/', CreateClientUser.as_view(), name='org-user-create'),
+    path('organization/user/role/', CreateRole.as_view(), name='org-user-create-role'),
     path('organization/domain/', CreateClientDomain.as_view(), name='org-domain'),
 ]

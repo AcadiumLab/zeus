@@ -4,6 +4,7 @@ from tenant_users.tenants.models import ExistsError
 from tenant_users.tenants.tasks import provision_tenant
 
 from tenant.models import Client, OrganizationUser, Domain
+from tenant.models.client_model import Department, Role
 from tenant.models.user_model import OrganizationUserProfile
 
 
@@ -104,3 +105,21 @@ class ClientUserProfileSerializer(serializers.ModelSerializer):
         )
 
         return profile
+
+
+class DepartmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Department
+        exclude = ()
+        extra_kwargs = {
+            'projects': {'read_only': True},
+        }
+
+
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        exclude = ()
+        extra_kwargs = {
+            'projects': {'read_only': True},
+        }

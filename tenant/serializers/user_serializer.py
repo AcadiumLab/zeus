@@ -14,7 +14,7 @@ class OrganizationUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrganizationUser
-        exclude = ('tenants',)
+        exclude = ('tenants', 'departments', 'roles',)
 
     def create(self, validated_data):
         user = OrganizationUser.objects.create_user(
